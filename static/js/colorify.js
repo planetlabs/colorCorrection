@@ -16,7 +16,7 @@ function makeImage(url) {
 	  	})
 	});
 
-	imageMap = new ol.Map({
+	var imageMap = new ol.Map({
 	    target:'olImage',
 	    view: new ol.View({
 		    projection: pixelProjection,
@@ -27,11 +27,7 @@ function makeImage(url) {
 	imageMap.addLayer(imageLayer);
 
 	imageLayer.on("postcompose", postcompose);
-}
-
-
-function identityCurve(originalValue) {
-	return originalValue;
+	return imageMap;
 }
 
 function levelCurve(min, max) {
@@ -60,9 +56,9 @@ function levelCurve(min, max) {
 }
 
 
-redCurve = levelCurve(50, 225);
-greenCurve = levelCurve(50, 225);
-blueCurve = levelCurve(50, 225);
+redCurve = levelCurve(0, 225);
+greenCurve = levelCurve(0, 225);
+blueCurve = levelCurve(0, 225);
 
 
 function postcompose(event) {
