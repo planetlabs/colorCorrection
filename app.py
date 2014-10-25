@@ -9,10 +9,19 @@ secret_key = None
 
 @app.route('/')
 def hello_index():
-    cat = "http://i.imgur.com/3STLv5i.jpg"
+    # Show an example image...cats!
     return flask.render_template(
         "index.html",
-        image_url="https://api.planet.com/v0/scenes/ortho/c3KBi2Z5Z4ShhoqJgWJ-l3OAfYamyWWqq5w=/square-thumb?size=lg&api_key=" + secret_key)
+        image_url="http://i.imgur.com/3STLv5i.jpg")
+
+@app.route('/levels/<path:image_name>/')
+def adjust_image(image_name):
+    image_url = "https://api.planet.com/v0/scenes/ortho/{image_name}=/square-thumb?size=lg&api_key={secret_key}".format(
+        image_name=image_name,
+        secret_key=secret_key)
+    return flask.render_template(
+        "index.html",
+        image_url=image_url)
 
 if __name__ == '__main__':
     aparser = argparse.ArgumentParser(
