@@ -24,20 +24,17 @@
           <div id="olImage" style="height:100%;"></div>
         </div>
         <div class="col-md-2">
-          <div class="row">
-            <br>
-            Red Control<br>
-            <b>0</b> <input id="red" type="text" class="span2" value="" data-slider-min="0" data-slider-max="255" data-slider-step="1" data-slider-value="[0,255]"/> <b>255</b>
+          <div class="row" style="padding:3px; background-color:#FFA1A1">
+            <canvas id="canvas-red" width=255 height=100></canvas><br>
+            <b>0</b> <input id="red" type="text" class="span2" value="" data-slider-min="0" data-slider-max="255" data-slider-step="1" data-slider-value="[0,255]" data-slider-tooltip="hide" data-slider-handle="round"/> <b>255</b>
           </div>
-          <div class="row">
-            <br>
-            Green Control<br>
-            <b>0</b> <input id="green" type="text" class="span2" value="" data-slider-min="0" data-slider-max="255" data-slider-step="1" data-slider-value="[0,255]"/> <b>255</b>
+          <div class="row" style="padding:3px; background-color:#A4FFA1">
+            <canvas id="canvas-green" width=255 height=100></canvas><br>
+            <b>0</b> <input id="green" type="text" class="span2" value="" data-slider-min="0" data-slider-max="255" data-slider-step="1" data-slider-value="[0,255]" data-slider-tooltip="hide" data-slider-handle="round"/> <b>255</b>
           </div>
-          <div class="row">
-            <br>
-            Blue Control<br>
-            <b>0</b> <input id="blue" type="text" class="span2" value="" data-slider-min="0" data-slider-max="255" data-slider-step="1" data-slider-value="[0,255]"/> <b>255</b>
+          <div class="row" style="padding:3px; background-color:#A1A9FF">
+            <canvas id="canvas-blue" width=255 height=100></canvas><br>
+            <b>0</b> <input id="blue" type="text" class="span2" value="" data-slider-min="0" data-slider-max="255" data-slider-step="1" data-slider-value="[0,255]" data-slider-tooltip="hide" data-slider-handle="round"/> <b>255</b>
           </div>
         </div>
       </div>
@@ -47,7 +44,6 @@
       var imageName = "{{ image_name }}";
       url = "http://i.imgur.com/3STLv5i.jpg"
       var imageMap = makeImage(url);
-
 
       function reCurve() {
         redCurve = levelCurve(redSlider.getValue()[0], redSlider.getValue()[1]);
@@ -59,6 +55,58 @@
       var redSlider = $("#red").slider().on("slide", reCurve).data('slider');
       var greenSlider = $("#green").slider().on("slide", reCurve).data('slider');
       var blueSlider = $("#blue").slider().on("slide", reCurve).data('slider');
+
+      function drawHistograms() {
+        // var context = document.getElementById("canvas-red").getContext("2d");
+        // context.fillRect(0,0,100,100);
+
+        var img = new Image();
+        img.crossOrigin = "anonymous";
+        img.src = url;
+        $(img).on("load", function() {
+          var canv = $("<canvas/>")[0];
+          canv.width = img.width;
+          canv.height = img.height;
+
+          canv.getContext('2d').drawImage(img, 0, 0, img.width, img.height);
+
+          var pixelData = canv.getContext("2d").getImageData(0, 0, img.width, img.height);
+          console.log(pixelData);
+
+          histogram = makeHistogram(pixelData.data, img.width, img.height);
+
+          function renderColorHistogram(channelHist, selector, color) {
+            // First, find the max value to normalize by
+            var max = 0;
+            for(var i = 0; i < channelHist.length; i++) {
+              if (channelHist[i] > max) {
+                max = channelHist[i];
+              }
+            }
+            // Prep our canvas
+            var histCanvas = $("#" + selector)[0];
+            var histCtx = histCanvas.getContext("2d");
+            histCtx.fillStyle="#FFFFFF";
+            histCtx.fillRect(0,0,255,100);
+
+            // Show the histogram!
+            histCtx.fillStyle=color;
+            for(var i = 0; i < channelHist.length; i++) {
+              var barSize = channelHist[i] / max * 100;
+              histCtx.fillRect(i, 100 - barSize, 1, barSize);
+            }
+          }
+
+          renderColorHistogram(histogram[0], "canvas-red", "#FF0000");
+          renderColorHistogram(histogram[1], "canvas-green", "#00FF00");
+          renderColorHistogram(histogram[2], "canvas-blue", "#0000FF");
+
+        });
+      }
+
+      setTimeout(function() {
+        drawHistograms();
+      }, 100);
 
     </script>
     <!-- Sup bru? Y U Reading mah html?  -->
