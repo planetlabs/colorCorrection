@@ -42,7 +42,8 @@
 
     <script type="text/javascript">
       var imageName = "{{ image_name }}";
-      url = "http://i.imgur.com/3STLv5i.jpg"
+      url = "{{ image_url|safe }}";
+      console.log("url:", url);
       var imageMap = makeImage(url);
 
       function reCurve() {
@@ -57,9 +58,6 @@
       var blueSlider = $("#blue").slider().on("slide", reCurve).data('slider');
 
       function drawHistograms() {
-        // var context = document.getElementById("canvas-red").getContext("2d");
-        // context.fillRect(0,0,100,100);
-
         var img = new Image();
         img.crossOrigin = "anonymous";
         img.src = url;
